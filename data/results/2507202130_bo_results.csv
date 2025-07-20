@@ -1,0 +1,3 @@
+kobert_train,kobert_test,kobert_y,PCA_dim_range,weight_1,percentile,iterations,depth,learning_rate,l2_leaf_reg,loss_function,grow_policy,bootstrap_type,early_stopping_rounds,threshold,PCA_dim,f1_score,precision,recall,accuracy_0,accuracy_1,weight_0
+,,,4:32:4,1.0,0.1,800,7,0.05,1.0,CrossEntropy,SymmetricTree,Bernoulli,50,0.42,28,0.8189415041782729,0.6933962264150944,1.0,0.0,1.0,
+,,,4:32:4,1.0,0.1,800,10,0.05,1.0,Logloss,SymmetricTree,Bayesian,10,0.43,20,0.8189415041782729,0.6933962264150944,1.0,0.0,1.0,1.5

@@ -1,0 +1,3 @@
+iterations,depth,learning_rate,l2_leaf_reg,loss_function,grow_policy,bootstrap_type,early_stopping_rounds,threshold,PCA_dim,trial,f1_score
+600,8,0.1,1.0,CrossEntropy,SymmetricTree,Bernoulli,30,0.46,32,0,0.8189415041782729
+800,9,0.01,3.0,CrossEntropy,SymmetricTree,Bernoulli,10,0.48,16,1,0.8189415041782729

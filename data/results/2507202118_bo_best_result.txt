@@ -1,0 +1,10 @@
+iterations: 600
+depth: 8
+learning_rate: 0.1
+l2_leaf_reg: 1.0
+loss_function: CrossEntropy
+grow_policy: SymmetricTree
+bootstrap_type: Bernoulli
+early_stopping_rounds: 30
+threshold: 0.46
+PCA_dim: 32
