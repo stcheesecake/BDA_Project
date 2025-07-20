@@ -1,0 +1,47 @@
+Feature,Data Type,Valid Count,Unique Count,Sample Value,결측치 보간
+ID,object,1056,1056,TRAIN_0000,
+generation,int64,1056,1,8,
+school1,object,1056,77,3e0057be3ecde495d1d6aab0bdc3092cce94440a6a4f6867a0ea69e07d8c7f7f,
+major_data,bool,1056,2,FALSE,
+job,object,1056,4,대학생,
+class1,int64,1056,9,4,
+re_registration,object,1056,2,아니요,
+nationality,object,1056,2,내국인,
+inflow_route,object,1056,9,에브리타임,
+whyBDA,object,1056,7,BDA 학회원만의 혜택을 누리고 싶어서(현직자 강연  잡 페스티벌  기업연계 공모전 등),
+time_input,float64,1056,18,4.5,
+certificate_acquisition,object,1056,37,없음,
+withdrawal,int64,1056,2,1,
+major1_1,object,1051,11,IT(컴퓨터 공학 포함),무응답
+major type,object,1049,2,단일 전공,무응답
+major_field,object,1048,51,공학 (컴퓨터 공학 제외),무응답
+what_to_gain,object,1045,9,프로젝트 경험,무응답
+hope_for_group,object,1045,3,네. 오프라인으로 참여하고 싶어요,무응답
+desired_career_path,object,1045,27,취업,무응답
+project_type,object,1045,2,팀,무응답
+desired_job,object,1045,90,데이터 엔지니어,무응답
+desired_certificate,object,1045,108,SQLD   정보처리기사,무응답
+certificate_study_period,object,1045,2,시험일 전 4주 (2/1 ~ 2/27),무응답
+desired_job_except_data,object,1045,35,개발,무응답
+incumbents_level,object,1045,2,주니어 (0~3년차),무응답
+incumbents_lecture,object,1045,8,커리어 패스 과정 (예시: 비전공자/전공자의 취업 준비 및 이직 과정),무응답
+incumbents_company_level,object,1045,22,국내 대기업 IT 계열 (금융 제조 ...),무응답
+incumbents_lecture_type,object,1045,3,온오프라인 동시,무응답
+incumbents_lecture_scale,object,1045,11,3~50명 내외의 강의 리스너와 1명의 현직자,무응답
+interested_company,object,1045,531,삼성이나 하이닉스,무응답
+expected_domain,object,1045,68,AI,무응답
+incumbents_lecture_scale_reason,object,1044,985,인원이 너무 많지 않아야 편하게 들을 수 있어서,무응답
+onedayclass_topic,object,1041,540,C++ 응용,무응답
+completed_semester,object,972,2,대학교 이수학기 4학기 이하,무응답
+major1_2,object,493,11,IT(컴퓨터 공학 포함),무응답
+contest_participitation,object,194,194,139ac02d03d83f839197195e65bc1810ef5282ade32d804efbdcf25417ebb160,무응답
+previous_class_6,object,174,6,해당없음,무응답
+previous_class_7,object,174,11,파문기,무응답
+previous_class_3,object,173,3,해당없음,무응답
+previous_class_4,object,172,4,해당없음,무응답
+previous_class_5,object,172,5,해당없음,무응답
+class2,float64,101,7,5,무응답
+contest_award,object,11,11,defae66334a1728169d0bc5b3a5a725106ceb19ce71349cf3587b99ed8ef0fff,무응답
+idea_contest,object,11,11,a83d7f2b72636df195f88e10f74bb6a03d30ea70d6a9c47d9f9ee347306f59d3,무응답
+class3,float64,2,2,5,무응답
+class4,float64,1,1,6,무응답

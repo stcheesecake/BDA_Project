@@ -1,0 +1,47 @@
+﻿,Sample Count (Valid),Null Count,Data Type,Unique Count,Sample Value
+ID,1056,0,object,1056,TRAIN_0000
+re_registration,1056,0,object,2,아니요
+certificate_acquisition,1056,0,object,37,없음
+time_input,1056,0,float64,18,4.5
+generation,1056,0,int64,1,8
+whyBDA,1056,0,object,7,"BDA 학회원만의 혜택을 누리고 싶어서(현직자 강연, 잡 페스티벌, 기업연계 공모전 등)"
+inflow_route,1056,0,object,9,에브리타임
+nationality,1056,0,object,2,내국인
+withdrawal,1056,0,int64,2,1
+class1,1056,0,int64,9,4
+job,1056,0,object,4,대학생
+major_data,1056,0,bool,2,False
+school1,1056,0,object,77,3e0057be3ecde495d1d6aab0bdc3092cce94440a6a4f6867a0ea69e07d8c7f7f
+major1_1,1051,5,object,11,IT(컴퓨터 공학 포함)
+major type,1049,7,object,2,단일 전공
+major_field,1048,8,object,51,공학 (컴퓨터 공학 제외)
+project_type,1045,11,object,2,팀
+incumbents_level,1045,11,object,2,주니어 (0~3년차)
+desired_job_except_data,1045,11,object,35,개발
+certificate_study_period,1045,11,object,2,시험일 전 4주 (2/1 ~ 2/27)
+desired_certificate,1045,11,object,108,"SQLD, 정보처리기사"
+desired_job,1045,11,object,90,데이터 엔지니어
+incumbents_lecture_type,1045,11,object,3,"온,오프라인 동시"
+desired_career_path,1045,11,object,27,취업
+incumbents_lecture_scale,1045,11,object,11,3~50명 내외의 강의 리스너와 1명의 현직자
+incumbents_company_level,1045,11,object,22,"국내 대기업 IT 계열 (금융, 제조 ...)"
+interested_company,1045,11,object,531,삼성이나 하이닉스
+expected_domain,1045,11,object,68,AI
+hope_for_group,1045,11,object,3,네. 오프라인으로 참여하고 싶어요
+what_to_gain,1045,11,object,9,프로젝트 경험
+incumbents_lecture,1045,11,object,8,커리어 패스 과정 (예시: 비전공자/전공자의 취업 준비 및 이직 과정)
+incumbents_lecture_scale_reason,1044,12,object,985,인원이 너무 많지 않아야 편하게 들을 수 있어서
+onedayclass_topic,1041,15,object,540,C++ 응용
+completed_semester,972,84,object,2,대학교 이수학기 4학기 이하
+major1_2,493,563,object,11,IT(컴퓨터 공학 포함)
+contest_participitation,194,862,object,194,139ac02d03d83f839197195e65bc1810ef5282ade32d804efbdcf25417ebb160
+previous_class_7,174,882,object,11,파문기
+previous_class_6,174,882,object,6,해당없음
+previous_class_3,173,883,object,3,해당없음
+previous_class_5,172,884,object,5,해당없음
+previous_class_4,172,884,object,4,해당없음
+class2,101,955,float64,7,5.0
+contest_award,11,1045,object,11,defae66334a1728169d0bc5b3a5a725106ceb19ce71349cf3587b99ed8ef0fff
+idea_contest,11,1045,object,11,a83d7f2b72636df195f88e10f74bb6a03d30ea70d6a9c47d9f9ee347306f59d3
+class3,2,1054,float64,2,5.0
+class4,1,1055,float64,1,6.0
