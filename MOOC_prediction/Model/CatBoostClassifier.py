@@ -11,21 +11,6 @@ from datetime import datetime
 import sys
 from sklearn.decomposition import PCA
 
-# 예시 실행 시 인자 설정 (테스트용, 실제 실행 시 제거)
-sys.argv = [
-    "CatBoostClassifier.py",
-    "--result_dir", "C:/Users/ilumi/BDA_Project/data/results",
-    "--PCA_dim", "4:32:4",
-    "--weight_0_range", "1.5:2:0.1",
-    "--depth_range", "6:10:1",
-    "--loss_function_list", "Logloss,CrossEntropy",
-    "--threshold_range", "0.5",
-    "--l2_leaf_reg_range", "1.0:3.0:1.0",
-    "--grow_policy_list", "SymmetricTree,Depthwise",
-    "--bootstrap_type_list", "Bayesian,Bernoulli",
-    "--early_stopping_rounds", "10:50:40"
-]
-
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -42,25 +27,25 @@ def parse_args():
     parser.add_argument("--submission_path", default=os.path.join(data_dir, "sample_submission.csv"))
     parser.add_argument("--result_dir", default=result_dir)
 
-    parser.add_argument("--kobert_train", default=None)
-    parser.add_argument("--kobert_test", default=None)
-    parser.add_argument("--kobert_y", default=None)
+    parser.add_argument("--kobert_train", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_train.npy")
+    parser.add_argument("--kobert_test", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_test.npy")
+    parser.add_argument("--kobert_y", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_y.npy")
 
-    parser.add_argument("--PCA_dim", default="-1")
+    parser.add_argument("--PCA_dim", default="32")
 
-    parser.add_argument("--weight_0_range", default="1.0:2.0:0.1")
+    parser.add_argument("--weight_0_range", default="2")
     parser.add_argument("--weight_1", type=float, default=1.0)
-    parser.add_argument("--percentile", type=float, default=0.1)
+    parser.add_argument("--percentile", type=float, default=0.5)
 
     parser.add_argument("--iterations_range", default="1000")
-    parser.add_argument("--depth_range", default="6:15:1")
+    parser.add_argument("--depth_range", default="9")
     parser.add_argument("--learning_rate_range", default="0.005")
-    parser.add_argument("--loss_function_list", default="Logloss,CrossEntropy")
-    parser.add_argument("--threshold_range", default="0.5:0.501:0.001")
+    parser.add_argument("--loss_function_list", default="CrossEntropy")
+    parser.add_argument("--threshold_range", default="0.5")
 
-    parser.add_argument("--l2_leaf_reg_range", default="1.0:3.0:1.0")
-    parser.add_argument("--grow_policy_list", default="SymmetricTree,Depthwise")
-    parser.add_argument("--bootstrap_type_list", default="Bayesian,Bernoulli")
+    parser.add_argument("--l2_leaf_reg_range", default="3.0")
+    parser.add_argument("--grow_policy_list", default="SymmetricTree")
+    parser.add_argument("--bootstrap_type_list", default="Bayesian")
 
     parser.add_argument("--eval_metric", default="F1")
     parser.add_argument("--early_stopping_rounds", default="50")

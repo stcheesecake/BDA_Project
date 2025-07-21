@@ -26,26 +26,26 @@ def parse_args():
     parser.add_argument("--submission_path", default=os.path.join(data_dir, "sample_submission.csv"))
     parser.add_argument("--result_dir", default=result_dir)
 
-    parser.add_argument("--kobert_train", default=None)
-    parser.add_argument("--kobert_test", default=None)
-    parser.add_argument("--kobert_y", default=None)
+    parser.add_argument("--kobert_train", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_train.npy")
+    parser.add_argument("--kobert_test", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_test.npy")
+    parser.add_argument("--kobert_y", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_y.npy")
 
-    parser.add_argument("--PCA_dim_range", default="4:32:4")
-    parser.add_argument("--weight_0_range", default="1.0:2.0:0.1")
+    parser.add_argument("--PCA_dim_range", default="256")
+    parser.add_argument("--weight_0_range", default="1.5")
     parser.add_argument("--weight_1", type=float, default=1.0)
     parser.add_argument("--percentile", type=float, default=0.1)
 
-    parser.add_argument("--iterations_range", default="500:1000:100")
-    parser.add_argument("--depth_range", default="6:10:1")
-    parser.add_argument("--learning_rate_range", default="0.01:0.1:0.01")
-    parser.add_argument("--loss_function_list", default="Logloss,CrossEntropy")
-    parser.add_argument("--threshold_range", default="0.4:0.6:0.01")
-    parser.add_argument("--l2_leaf_reg_range", default="1.0:3.0:1.0")
-    parser.add_argument("--grow_policy_list", default="SymmetricTree,Depthwise")
-    parser.add_argument("--bootstrap_type_list", default="Bayesian,Bernoulli")
-    parser.add_argument("--early_stopping_rounds_range", default="10:50:20")
+    parser.add_argument("--iterations_range", default="800")
+    parser.add_argument("--depth_range", default="12")
+    parser.add_argument("--learning_rate_range", default="0.01")
+    parser.add_argument("--loss_function_list", default="CrossEntropy")
+    parser.add_argument("--threshold_range", default="0.501")
+    parser.add_argument("--l2_leaf_reg_range", default="3.0")
+    parser.add_argument("--grow_policy_list", default="SymmetricTree")
+    parser.add_argument("--bootstrap_type_list", default="Bayesian")
+    parser.add_argument("--early_stopping_rounds_range", default="50")
 
-    parser.add_argument("--n_trials", type=int, default=2)
+    parser.add_argument("--n_trials", type=int, default=1)
     parser.add_argument("--random_seed", type=int, default=42)
     parser.add_argument("--verbose", type=bool, default=False)
 
@@ -83,8 +83,8 @@ def main():
     early_stop_list = parse_range_string(args.early_stopping_rounds_range)
 
     if args.kobert_train and args.kobert_test and args.kobert_y:
-        X = np.load(args.kobert_train)
-        X_test = np.load(args.kobert_test)
+        X = np.load(args.kobert_train).astype(np.float32)
+        X_test = np.load(args.kobert_test).astype(np.float32)
         y = np.load(args.kobert_y)
 
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, stratify=y, random_state=args.random_seed)
@@ -165,7 +165,9 @@ def main():
             X_vl = pca.transform(X_val)
             Xt = pca.transform(X_test)
 
-        model = CatBoostClassifier(**params)
+        model = CatBoostClassifier(
+            **params
+        )
         model.fit(X_tr, y_train, eval_set=(X_vl, y_val))
 
         val_proba = model.predict_proba(X_vl)[:, 1]

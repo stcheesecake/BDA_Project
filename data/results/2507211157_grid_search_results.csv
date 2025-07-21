@@ -1,0 +1,3 @@
+iterations,depth,learning_rate,weight_0,weight_1,loss_function,threshold,l2_leaf_reg,grow_policy,bootstrap_type,early_stopping_rounds,PCA_dim,percentile,eval_metric,random_seed,verbose,f1_score,precision,recall,val_acc,acc_class_0,acc_class_1
+1000,9,0.005,1.5,1.0,Logloss,0.5,3.0,SymmetricTree,Bayesian,50,-1,0.5,F1,42,False,0.7952522255192879,0.7052631578947368,0.9115646258503401,0.6745283018867925,0.13846153846153847,0.9115646258503401
+1000,9,0.005,1.5,1.0,CrossEntropy,0.5,3.0,SymmetricTree,Bayesian,50,-1,0.5,F1,42,False,0.8179271708683473,0.6952380952380952,0.9931972789115646,0.6933962264150944,0.015384615384615385,0.9931972789115646
