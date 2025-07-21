@@ -27,7 +27,7 @@ def parse_args():
     parser.add_argument("--result_dir", default=result_dir)
 
     parser.add_argument("--kobert_train", default="/root/BDA/BDA_Project/data/kobert_results/kobert_train.npy")
-    parser.add_argument("--kobert_test", default="/root/BDA/ilumi/BDA_Project/data/kobert_results/kobert_test.npy")
+    parser.add_argument("--kobert_test", default="/root/BDA/BDA_Project/data/kobert_results/kobert_test.npy")
     parser.add_argument("--kobert_y", default="/root/BDA/BDA_Project/data/kobert_results/kobert_y.npy")
 
     parser.add_argument("--PCA_dim_range", default="-1:512:1")
