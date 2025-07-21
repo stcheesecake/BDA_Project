@@ -8,17 +8,15 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_sc
 from tqdm import tqdm
 import itertools
 from datetime import datetime
-import sys
 from sklearn.decomposition import PCA
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
-
     try:
         base_dir = os.path.dirname(os.path.abspath(__file__))
     except NameError:
         base_dir = os.getcwd()
-
     data_dir = os.path.join(base_dir, "..", "..", "data")
     result_dir = os.path.join(data_dir, "results")
 
@@ -27,20 +25,19 @@ def parse_args():
     parser.add_argument("--submission_path", default=os.path.join(data_dir, "sample_submission.csv"))
     parser.add_argument("--result_dir", default=result_dir)
 
-    parser.add_argument("--kobert_train", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_train.npy")
-    parser.add_argument("--kobert_test", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_test.npy")
-    parser.add_argument("--kobert_y", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_y.npy")
+    parser.add_argument("--kobert_train", default=None)
+    parser.add_argument("--kobert_test", default=None)
+    parser.add_argument("--kobert_y", default=None)
+    parser.add_argument("--PCA_dim", default="-1")
 
-    parser.add_argument("--PCA_dim", default="51")
-
-    parser.add_argument("--weight_0_range", default="3")
+    parser.add_argument("--weight_0_range", default="1.5")
     parser.add_argument("--weight_1", type=float, default=1.0)
     parser.add_argument("--percentile", type=float, default=0.5)
 
-    parser.add_argument("--iterations_range", default="800")
-    parser.add_argument("--depth_range", default="10")
-    parser.add_argument("--learning_rate_range", default="0.04")
-    parser.add_argument("--loss_function_list", default="Logloss")
+    parser.add_argument("--iterations_range", default="1000")
+    parser.add_argument("--depth_range", default="9")
+    parser.add_argument("--learning_rate_range", default="0.05")
+    parser.add_argument("--loss_function_list", default="CrossEntropy")
     parser.add_argument("--threshold_range", default="0.5")
 
     parser.add_argument("--l2_leaf_reg_range", default="3.0")
@@ -48,11 +45,12 @@ def parse_args():
     parser.add_argument("--bootstrap_type_list", default="Bayesian")
 
     parser.add_argument("--eval_metric", default="F1")
-    parser.add_argument("--early_stopping_rounds", default="30")
+    parser.add_argument("--early_stopping_rounds", default="10")
     parser.add_argument("--random_seed", type=int, default=42)
     parser.add_argument("--verbose", type=bool, default=False)
 
     return parser.parse_args()
+
 
 def parse_range_string(s, is_float=False):
     if ":" in s:
@@ -64,8 +62,15 @@ def parse_range_string(s, is_float=False):
     else:
         return [float(s)] if is_float else [int(s)]
 
+
 def parse_list_string(s):
     return s.split(",")
+
+
+def log_trial_result(value, params, acc0, acc1):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S,%f")[:-3]
+    print(f"[I {timestamp}] finished with value: {value} and parameters: {params} | 0_ACC: {acc0:.4f}, 1_ACC: {acc1:.4f}")
+
 
 def main():
     args = parse_args()
@@ -75,7 +80,6 @@ def main():
     PCA_dims = parse_range_string(args.PCA_dim, is_float=False)
     PCA_dim = PCA_dims[0] if len(PCA_dims) == 1 else -1
 
-    # -------------------- 데이터 로딩 --------------------
     if args.kobert_train and args.kobert_test and args.kobert_y:
         X = np.load(args.kobert_train)
         X_test = np.load(args.kobert_test)
@@ -84,13 +88,11 @@ def main():
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, stratify=y, random_state=args.random_seed)
         cat_features = None
 
-        # ✅ PCA는 오직 한 번만 학습
         if PCA_dim != -1:
             pca = PCA(n_components=PCA_dim)
             X_train = pca.fit_transform(X_train)
             X_val = pca.transform(X_val)
             X_test = pca.transform(X_test)
-
     else:
         train = pd.read_csv(args.train_path)
         test = pd.read_csv(args.test_path)
@@ -113,12 +115,9 @@ def main():
         test = test.astype(str).fillna('missing')
         cat_features = train.columns.tolist()
 
-        X_train, X_val, y_train, y_val = train_test_split(
-            train, y, test_size=0.2, stratify=y, random_state=args.random_seed
-        )
+        X_train, X_val, y_train, y_val = train_test_split(train, y, test_size=0.2, stratify=y, random_state=args.random_seed)
         X_test = test
 
-    # -------------------- 하이퍼파라미터 파싱 --------------------
     iterations_list = parse_range_string(args.iterations_range)
     depth_list = parse_range_string(args.depth_range)
     learning_rate_list = parse_range_string(args.learning_rate_range, is_float=True)
@@ -131,23 +130,15 @@ def main():
     early_stopping_list = parse_range_string(args.early_stopping_rounds)
 
     param_combinations = list(itertools.product(
-        iterations_list,
-        depth_list,
-        learning_rate_list,
-        weight_0_list,
-        loss_function_list,
-        threshold_list,
-        l2_leaf_reg_list,
-        grow_policy_list,
-        bootstrap_type_list,
-        early_stopping_list
+        iterations_list, depth_list, learning_rate_list, weight_0_list,
+        loss_function_list, threshold_list, l2_leaf_reg_list,
+        grow_policy_list, bootstrap_type_list, early_stopping_list
     ))
 
     best_f1 = -1
     best_model = None
     best_params = {}
     best_val_pred = None
-    results = []
 
     for iter_, depth_, lr_, w0, loss_func, threshold, l2_, grow_pol, boot_type, early_stop in tqdm(param_combinations, desc="🔍 Grid Searching"):
         model_params = {
@@ -178,61 +169,37 @@ def main():
         f1 = f1_score(y_val, val_pred)
         precision = precision_score(y_val, val_pred)
         recall = recall_score(y_val, val_pred)
-        acc_total = accuracy_score(y_val, val_pred)
         acc_0 = accuracy_score(y_val[y_val == 0], val_pred[y_val == 0])
         acc_1 = accuracy_score(y_val[y_val == 1], val_pred[y_val == 1])
 
-        results.append({
-            "iterations": iter_,
-            "depth": depth_,
-            "learning_rate": lr_,
-            "weight_0": w0,
-            "weight_1": args.weight_1,
-            "loss_function": loss_func,
-            "threshold": threshold,
-            "l2_leaf_reg": l2_,
-            "grow_policy": grow_pol,
-            "bootstrap_type": boot_type,
-            "early_stopping_rounds": early_stop,
-            "PCA_dim": PCA_dim,
-            "percentile": args.percentile,
-            "eval_metric": args.eval_metric,
-            "random_seed": args.random_seed,
-            "verbose": args.verbose,
-            "f1_score": f1,
-            "precision": precision,
-            "recall": recall,
-            "val_acc": acc_total,
-            "acc_class_0": acc_0,
-            "acc_class_1": acc_1
-        })
+        log_trial_result(f1, {
+            'iterations': iter_, 'depth': depth_, 'learning_rate': lr_,
+            'l2_leaf_reg': l2_, 'loss_function': loss_func,
+            'grow_policy': grow_pol, 'bootstrap_type': boot_type,
+            'early_stopping_rounds': early_stop,
+            'threshold': threshold, 'PCA_dim': PCA_dim
+        }, acc_0, acc_1)
 
         if f1 > best_f1:
             best_f1 = f1
             best_model = model
             best_val_pred = val_pred
-            best_params = results[-1]
+            best_params = {
+                'iterations': iter_, 'depth': depth_, 'learning_rate': lr_,
+                'l2_leaf_reg': l2_, 'loss_function': loss_func,
+                'grow_policy': grow_pol, 'bootstrap_type': boot_type,
+                'early_stopping_rounds': early_stop,
+                'threshold': threshold, 'PCA_dim': PCA_dim
+            }
 
-    pd.DataFrame(results).to_csv(os.path.join(args.result_dir, f"{timestamp}_grid_search_results.csv"), index=False)
+    if best_model:
+        test_proba = best_model.predict_proba(X_test)[:, 1]
+        test_pred = (test_proba >= best_params['threshold']).astype(int)
 
-    with open(os.path.join(args.result_dir, f"{timestamp}_best_result.txt"), "w", encoding="utf-8") as f:
-        f.write("Best Params:\n")
-        for k, v in best_params.items():
-            f.write(f"{k}: {v}\n")
-        f.write(f"\nBest F1 Score: {best_f1:.4f}\n")
-        f.write(f"Val Accuracy: {accuracy_score(y_val, best_val_pred):.4f}\n")
-        f.write(f"Precision: {precision_score(y_val, best_val_pred):.4f}\n")
-        f.write(f"Recall: {recall_score(y_val, best_val_pred):.4f}\n")
-        f.write(f"Class 0 Accuracy: {accuracy_score(y_val[y_val == 0], best_val_pred[y_val == 0]):.4f}\n")
-        f.write(f"Class 1 Accuracy: {accuracy_score(y_val[y_val == 1], best_val_pred[y_val == 1]):.4f}\n")
+        submission = pd.read_csv(args.submission_path)
+        submission['withdrawal'] = test_pred
+        submission.to_csv(os.path.join(args.result_dir, f"{timestamp}_submission_catboost.csv"), index=False)
 
-    # ✅ 이미 위에서 처리된 X_test 사용
-    test_proba = best_model.predict_proba(X_test)[:, 1]
-    test_pred = (test_proba >= best_params['threshold']).astype(int)
-
-    submission = pd.read_csv(args.submission_path)
-    submission['withdrawal'] = test_pred
-    submission.to_csv(os.path.join(args.result_dir, f"{timestamp}_submission_catboost.csv"), index=False)
 
 if __name__ == "__main__":
     main()
