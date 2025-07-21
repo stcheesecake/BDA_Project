@@ -26,26 +26,26 @@ def parse_args():
     parser.add_argument("--submission_path", default=os.path.join(data_dir, "sample_submission.csv"))
     parser.add_argument("--result_dir", default=result_dir)
 
-    parser.add_argument("--kobert_train", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_train.npy")
-    parser.add_argument("--kobert_test", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_test.npy")
-    parser.add_argument("--kobert_y", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_y.npy")
+    parser.add_argument("--kobert_train", default="/root/bda/BDA_Project/data/kobert_results/kobert_train.npy")
+    parser.add_argument("--kobert_test", default="/root/bda/ilumi/BDA_Project/data/kobert_results/kobert_test.npy")
+    parser.add_argument("--kobert_y", default="/root/bda/BDA_Project/data/kobert_results/kobert_y.npy")
 
-    parser.add_argument("--PCA_dim_range", default="256")
-    parser.add_argument("--weight_0_range", default="1.5")
+    parser.add_argument("--PCA_dim_range", default="-1:512:1")
+    parser.add_argument("--weight_0_range", default="1.5:4.0:0.1")
     parser.add_argument("--weight_1", type=float, default=1.0)
     parser.add_argument("--percentile", type=float, default=0.1)
 
     parser.add_argument("--iterations_range", default="800")
-    parser.add_argument("--depth_range", default="12")
+    parser.add_argument("--depth_range", default="9:15")
     parser.add_argument("--learning_rate_range", default="0.01")
-    parser.add_argument("--loss_function_list", default="CrossEntropy")
-    parser.add_argument("--threshold_range", default="0.501")
+    parser.add_argument("--loss_function_list", default="CrossEntropy,Logloss")
+    parser.add_argument("--threshold_range", default="0.501:0.57")
     parser.add_argument("--l2_leaf_reg_range", default="3.0")
     parser.add_argument("--grow_policy_list", default="SymmetricTree")
     parser.add_argument("--bootstrap_type_list", default="Bayesian")
     parser.add_argument("--early_stopping_rounds_range", default="50")
 
-    parser.add_argument("--n_trials", type=int, default=1)
+    parser.add_argument("--n_trials", type=int, default=10000)
     parser.add_argument("--random_seed", type=int, default=42)
     parser.add_argument("--verbose", type=bool, default=False)
 
@@ -165,9 +165,7 @@ def main():
             X_vl = pca.transform(X_val)
             Xt = pca.transform(X_test)
 
-        model = CatBoostClassifier(
-            **params
-        )
+        model = CatBoostClassifier(**params)
         model.fit(X_tr, y_train, eval_set=(X_vl, y_val))
 
         val_proba = model.predict_proba(X_vl)[:, 1]
@@ -185,13 +183,19 @@ def main():
         return trial_data["f1_score"]
 
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=args.n_trials)
 
-    best_result = max(results, key=lambda x: x['f1_score'])
-    with open(os.path.join(args.result_dir, f"{timestamp}_bo_best_result.txt"), "w", encoding="utf-8") as f:
-        for k, v in best_result.items():
-            if k not in {"verbose", "train_path", "test_path", "submission_path", "result_dir"}:
-                f.write(f"{k}: {v}\n")
+    try:
+        study.optimize(objective, n_trials=args.n_trials)
+    except KeyboardInterrupt:
+        print("\n🛑 Optimization manually interrupted.")
+    finally:
+        if results:
+            best_result = max(results, key=lambda x: x['f1_score'])
+            with open(os.path.join(args.result_dir, f"{timestamp}_bo_best_result.txt"), "w", encoding="utf-8") as f:
+                for k, v in best_result.items():
+                    if k not in {"verbose", "train_path", "test_path", "submission_path", "result_dir"}:
+                        f.write(f"{k}: {v}\n")
+            print(f"✅ Saved best_result.txt after interruption.")
 
 if __name__ == "__main__":
     main()

@@ -31,16 +31,16 @@ def parse_args():
     parser.add_argument("--kobert_test", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_test.npy")
     parser.add_argument("--kobert_y", default="C:/Users/ilumi/BDA_Project/data/kobert_results/kobert_y.npy")
 
-    parser.add_argument("--PCA_dim", default="32")
+    parser.add_argument("--PCA_dim", default="51")
 
-    parser.add_argument("--weight_0_range", default="2")
+    parser.add_argument("--weight_0_range", default="3")
     parser.add_argument("--weight_1", type=float, default=1.0)
     parser.add_argument("--percentile", type=float, default=0.5)
 
-    parser.add_argument("--iterations_range", default="1000")
-    parser.add_argument("--depth_range", default="9")
-    parser.add_argument("--learning_rate_range", default="0.005")
-    parser.add_argument("--loss_function_list", default="CrossEntropy")
+    parser.add_argument("--iterations_range", default="800")
+    parser.add_argument("--depth_range", default="10")
+    parser.add_argument("--learning_rate_range", default="0.04")
+    parser.add_argument("--loss_function_list", default="Logloss")
     parser.add_argument("--threshold_range", default="0.5")
 
     parser.add_argument("--l2_leaf_reg_range", default="3.0")
@@ -48,7 +48,7 @@ def parse_args():
     parser.add_argument("--bootstrap_type_list", default="Bayesian")
 
     parser.add_argument("--eval_metric", default="F1")
-    parser.add_argument("--early_stopping_rounds", default="50")
+    parser.add_argument("--early_stopping_rounds", default="30")
     parser.add_argument("--random_seed", type=int, default=42)
     parser.add_argument("--verbose", type=bool, default=False)
 
@@ -75,18 +75,22 @@ def main():
     PCA_dims = parse_range_string(args.PCA_dim, is_float=False)
     PCA_dim = PCA_dims[0] if len(PCA_dims) == 1 else -1
 
+    # -------------------- 데이터 로딩 --------------------
     if args.kobert_train and args.kobert_test and args.kobert_y:
         X = np.load(args.kobert_train)
         X_test = np.load(args.kobert_test)
         y = np.load(args.kobert_y)
 
-        if PCA_dim != -1:
-            pca = PCA(n_components=PCA_dim)
-            X = pca.fit_transform(X)
-            X_test = pca.transform(X_test)
-
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, stratify=y, random_state=args.random_seed)
         cat_features = None
+
+        # ✅ PCA는 오직 한 번만 학습
+        if PCA_dim != -1:
+            pca = PCA(n_components=PCA_dim)
+            X_train = pca.fit_transform(X_train)
+            X_val = pca.transform(X_val)
+            X_test = pca.transform(X_test)
+
     else:
         train = pd.read_csv(args.train_path)
         test = pd.read_csv(args.test_path)
@@ -112,13 +116,9 @@ def main():
         X_train, X_val, y_train, y_val = train_test_split(
             train, y, test_size=0.2, stratify=y, random_state=args.random_seed
         )
+        X_test = test
 
-    if PCA_dim != -1 and cat_features is None:
-        pca = PCA(n_components=PCA_dim)
-        X_train = pca.fit_transform(X_train)
-        X_val = pca.transform(X_val)
-        X_test = pca.transform(X_test)
-
+    # -------------------- 하이퍼파라미터 파싱 --------------------
     iterations_list = parse_range_string(args.iterations_range)
     depth_list = parse_range_string(args.depth_range)
     learning_rate_list = parse_range_string(args.learning_rate_range, is_float=True)
@@ -226,10 +226,7 @@ def main():
         f.write(f"Class 0 Accuracy: {accuracy_score(y_val[y_val == 0], best_val_pred[y_val == 0]):.4f}\n")
         f.write(f"Class 1 Accuracy: {accuracy_score(y_val[y_val == 1], best_val_pred[y_val == 1]):.4f}\n")
 
-    X_test = np.load(args.kobert_test) if args.kobert_test else test
-    if PCA_dim != -1 and cat_features is None:
-        X_test = pca.transform(X_test)
-
+    # ✅ 이미 위에서 처리된 X_test 사용
     test_proba = best_model.predict_proba(X_test)[:, 1]
     test_pred = (test_proba >= best_params['threshold']).astype(int)
 

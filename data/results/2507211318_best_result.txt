@@ -1,0 +1,30 @@
+Best Params:
+iterations: 800
+depth: 10
+learning_rate: 0.04
+weight_0: 5.0
+weight_1: 1.0
+loss_function: Logloss
+threshold: 0.5
+l2_leaf_reg: 3.0
+grow_policy: SymmetricTree
+bootstrap_type: Bayesian
+early_stopping_rounds: 30
+PCA_dim: 51
+percentile: 0.5
+eval_metric: F1
+random_seed: 42
+verbose: False
+f1_score: 0.5477178423236515
+precision: 0.7021276595744681
+recall: 0.4489795918367347
+val_acc: 0.4858490566037736
+acc_class_0: 0.5692307692307692
+acc_class_1: 0.4489795918367347
+
+Best F1 Score: 0.5477
+Val Accuracy: 0.4858
+Precision: 0.7021
+Recall: 0.4490
+Class 0 Accuracy: 0.5692
+Class 1 Accuracy: 0.4490
