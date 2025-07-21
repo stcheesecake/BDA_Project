@@ -26,9 +26,9 @@ def parse_args():
     parser.add_argument("--submission_path", default=os.path.join(data_dir, "sample_submission.csv"))
     parser.add_argument("--result_dir", default=result_dir)
 
-    parser.add_argument("--kobert_train", default="/root/bda/BDA_Project/data/kobert_results/kobert_train.npy")
-    parser.add_argument("--kobert_test", default="/root/bda/ilumi/BDA_Project/data/kobert_results/kobert_test.npy")
-    parser.add_argument("--kobert_y", default="/root/bda/BDA_Project/data/kobert_results/kobert_y.npy")
+    parser.add_argument("--kobert_train", default="/root/BDA/BDA_Project/data/kobert_results/kobert_train.npy")
+    parser.add_argument("--kobert_test", default="/root/BDA/ilumi/BDA_Project/data/kobert_results/kobert_test.npy")
+    parser.add_argument("--kobert_y", default="/root/BDA/BDA_Project/data/kobert_results/kobert_y.npy")
 
     parser.add_argument("--PCA_dim_range", default="-1:512:1")
     parser.add_argument("--weight_0_range", default="1.5:4.0:0.1")
@@ -45,7 +45,7 @@ def parse_args():
     parser.add_argument("--bootstrap_type_list", default="Bayesian")
     parser.add_argument("--early_stopping_rounds_range", default="50")
 
-    parser.add_argument("--n_trials", type=int, default=10000)
+    parser.add_argument("--n_trials", type=int, default=3000)
     parser.add_argument("--random_seed", type=int, default=42)
     parser.add_argument("--verbose", type=bool, default=False)
 
