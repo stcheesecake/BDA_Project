@@ -36,7 +36,7 @@ def parse_args():
     parser.add_argument("--percentile", type=float, default=0.1)
 
     parser.add_argument("--iterations_range", default="800")
-    parser.add_argument("--depth_range", default="9:15")
+    parser.add_argument("--depth_range", default="9:15:1")
     parser.add_argument("--learning_rate_range", default="0.01")
     parser.add_argument("--loss_function_list", default="CrossEntropy,Logloss")
     parser.add_argument("--threshold_range", default="0.501:0.57")
