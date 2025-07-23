@@ -2,6 +2,7 @@ import os
 import argparse
 import pandas as pd
 import numpy as np
+import random
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
@@ -12,23 +13,22 @@ from sklearn.decomposition import PCA
 
 def parse_args():
     parser = argparse.ArgumentParser()
-
     try:
         base_dir = os.path.dirname(os.path.abspath(__file__))
     except NameError:
         base_dir = os.getcwd()
+    data_dir = os.path.join(base_dir, "..", "..", "train_test_data")
+    kobert_dir = os.path.join(data_dir, "kobert_embedding")
+    result_dir = os.path.join(base_dir, "..", "..", "..", "data", "results")
 
-    data_dir = os.path.join(base_dir, "..", "..", "data")
-    result_dir = os.path.join(data_dir, "results")
-
-    parser.add_argument("--train_path", default=os.path.join(data_dir, "train.csv"))
-    parser.add_argument("--test_path", default=os.path.join(data_dir, "test.csv"))
-    parser.add_argument("--submission_path", default=os.path.join(data_dir, "sample_submission.csv"))
+    parser.add_argument("--train_path", default=os.path.join(data_dir,"train.csv"))
+    parser.add_argument("--test_path", default=os.path.join(data_dir,"test.csv"))
+    parser.add_argument("--submission_path", default=os.path.join(data_dir,"sample_submission.csv"))
     parser.add_argument("--result_dir", default=result_dir)
 
-    parser.add_argument("--kobert_train", default=None)
-    parser.add_argument("--kobert_test", default=None)
-    parser.add_argument("--kobert_y", default=None)
+    parser.add_argument("--kobert_train", default=os.path.join(kobert_dir, "kobert_train.npy"))
+    parser.add_argument("--kobert_test", default=os.path.join(kobert_dir, "kobert_test.npy"))
+    parser.add_argument("--kobert_y", default=os.path.join(kobert_dir, "kobert_y.npy"))
 
     parser.add_argument("--PCA_dim_range", default="1:512:1")
     parser.add_argument("--weight_0_range", default="1.1:4.0:0.1")
@@ -64,11 +64,17 @@ def parse_range_string(s, is_float=False):
 def parse_list_string(s):
     return s.split(",")
 
+def set_random_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+
 def main():
     args = parse_args()
     os.makedirs(args.result_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%y%m%d%H%M")
     result_path = os.path.join(args.result_dir, f"{timestamp}_bo_results.csv")
+
+    set_random_seed(args.random_seed)
 
     PCA_dims = parse_range_string(args.PCA_dim_range, is_float=False)
     weight_0_list = parse_range_string(args.weight_0_range, is_float=True)
@@ -86,7 +92,6 @@ def main():
         X = np.load(args.kobert_train).astype(np.float32)
         X_test = np.load(args.kobert_test).astype(np.float32)
         y = np.load(args.kobert_y)
-
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, stratify=y, random_state=args.random_seed)
         cat_features = None
     else:
@@ -96,21 +101,17 @@ def main():
 
         y = train['withdrawal']
         train = train.drop(columns=['withdrawal'])
-
         drop_cols = ['ID']
         drop_cols.extend(train.nunique()[train.nunique() == 1].index.tolist())
         valid_counts = train.notnull().sum()
         threshold_count = valid_counts.quantile(args.percentile)
         drop_cols.extend(valid_counts[valid_counts < threshold_count].index.tolist())
         drop_cols = list(set(drop_cols))
-
         train = train.drop(columns=drop_cols)
         test = test.drop(columns=drop_cols)
-
         train = train.astype(str).fillna('missing')
         test = test.astype(str).fillna('missing')
         cat_features = train.columns.tolist()
-
         X_train, X_val, y_train, y_val = train_test_split(train, y, test_size=0.2, stratify=y, random_state=args.random_seed)
         X_test = test
 
@@ -138,7 +139,8 @@ def main():
             'verbose': args.verbose,
             'random_seed': args.random_seed,
             'eval_metric': "F1",
-            'task_type': "GPU"
+            'task_type': "GPU",
+            'thread_count': 1
         }
 
         if cat_features is not None:
