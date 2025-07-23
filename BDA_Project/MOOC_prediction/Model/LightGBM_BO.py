@@ -42,7 +42,7 @@ def parse_args():
     parser.add_argument("--max_depth_range", default="3:15:2")
     parser.add_argument("--threshold_range", default="0.501:0.6:0.001")
 
-    parser.add_argument("--n_trials", type=int, default=1000)
+    parser.add_argument("--n_trials", type=int, default=10000)
     parser.add_argument("--random_seed", type=int, default=42)
     parser.add_argument("--verbose", type=bool, default=False)
 
