@@ -41,14 +41,13 @@ def parse_args():
     parser.add_argument("--loss_function_list", default="CrossEntropy,Logloss")
     parser.add_argument("--threshold_range", default="0.501:0.57:0.001")
     parser.add_argument("--l2_leaf_reg_range", default="1.0:3.0:0.1")
-    parser.add_argument("--grow_policy_list", default="SymmetricTree")
-    parser.add_argument("--bootstrap_type_list", default="Bayesian")
+    parser.add_argument("--grow_policy_list", default="SymmetricTree,Depthwise,Lossguide")
+    parser.add_argument("--bootstrap_type_list", default="Bayesian,Bernoulli,Poisson,MVS,No")
     parser.add_argument("--early_stopping_rounds_range", default="50")
 
     parser.add_argument("--n_trials", type=int, default=3000)
     parser.add_argument("--random_seed", type=int, default=42)
     parser.add_argument("--verbose", type=bool, default=False)
-
     return parser.parse_args()
 
 def parse_range_string(s, is_float=False):
